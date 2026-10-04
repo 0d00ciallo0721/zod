@@ -397,6 +397,13 @@ test("jwt token", () => {
   // type isn't JWT
   const d5 = makeJwt({ typ: "SUP", alg: "HS256" }, { foo: "bar" });
   expect(() => jwt.parse(d5)).toThrow();
+
+  // base64url chars in the header, e.g. from a jku url with a query string
+  const d6 = makeJwt({ typ: "JWT", alg: "HS256", jku: "https://idp.example.com/jwks?tenant=abc" }, {});
+  jwt.parse(d6);
+
+  // header without base64url chars keeps parsing
+  jwt.parse(makeJwt({ typ: "JWT", alg: "HS256" }, {}));
 });
 
 test("url validations", () => {
